@@ -43,6 +43,7 @@ function AddProduct({ onClose, userId, categories }) {
   const validateStep = () => {
     const { title, categories, purchase_price, rent_price, rent_duration } =
       form.values;
+    
     if (active === 0 && title.trim() === "") {
       errorPopup("Title is required.");
       return false;
@@ -55,9 +56,14 @@ function AddProduct({ onClose, userId, categories }) {
     ) {
       errorPopup("All price and rent fields are required.");
       return false;
+    } else if (active === 3 && (parseFloat(purchase_price) <= 0 || parseFloat(rent_price) <= 0)) {
+      errorPopup("Price and rent must be greater than zero.");
+      return false;
     }
+    
     return true;
   };
+  
 
   const nextStep = () => {
     const isStepValid = validateStep();
