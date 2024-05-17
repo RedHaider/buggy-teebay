@@ -16,9 +16,7 @@ import { GrClose } from "react-icons/gr";
 import { formatDate } from "../../helper/formatDate";
 
 const BuyOrRent = ({ product, onClose, userId }) => {
-  // TODO Reusable input/form componennts
-  const [rentOpened, { open: rentOpen, close: rentClose }] =
-    useDisclosure(false);
+  const [rentOpened, { open: rentOpen, close: rentClose }] = useDisclosure(false);
   const [buyOpened, { open: buyOpen, close: buyClose }] = useDisclosure(false);
 
   const rentalDates = useForm({
@@ -44,6 +42,7 @@ const BuyOrRent = ({ product, onClose, userId }) => {
   const handleRentClick = () => {
     rentOpen();
   };
+
   const handleBuyClick = () => {
     buyOpen();
   };
@@ -77,8 +76,35 @@ const BuyOrRent = ({ product, onClose, userId }) => {
 
   const handleRentConfirm = async () => {
     try {
-      const formattedRentalStart = formatDate(rentalDates.values.rentalStart);
-      const formattedRentalEnd = formatDate(rentalDates.values.rentalEnd);
+      // Getting rental 
+      const { rentalStart, rentalEnd } = rentalDates.values;
+      const formattedRentalStart = formatDate(rentalStart);
+      const formattedRentalEnd = formatDate(rentalEnd);
+
+      //  rental dates
+      if (new Date(rentalStart) >= new Date(rentalEnd)) {
+        console.error("Rental start date must be earlier than rental end date");
+        return;
+      }
+
+      // Fetch  rentals for the product
+      const rentalsResponse = await fetch(`http://localhost:3001/api/v1/rentals/${product.id}`);
+      const existingRentals = await rentalsResponse.json();
+
+      // overlapping rent
+      const isOverlapping = existingRentals.some(rental => {
+        const existingStart = new Date(rental.rentalStart);
+        const existingEnd = new Date(rental.rentalEnd);
+        const newStart = new Date(rentalStart);
+        const newEnd = new Date(rentalEnd);
+
+        return (newStart < existingEnd && newEnd > existingStart);
+      });
+
+      if (isOverlapping) {
+        console.error("Rental period overlaps with an existing rental");
+        return;
+      }
 
       const response = await fetch(
         `http://localhost:3001/api/v1/rent/${userId}/${product.id}`,
