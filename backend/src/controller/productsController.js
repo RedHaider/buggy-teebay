@@ -142,36 +142,37 @@ const addProduct = async (req, res) => {
 };
 
 const deleteProduct = async (req, res) => {
-  const userId = parseInt(req.params.userId, 10); // convert string to integer
+  const userId = parseInt(req.params.userId, 10); // Convert string to integer
 
   try {
     const productId = parseInt(req.params.productId, 10);
 
-    // Find product by ID
+    // Check if the product exists
     const product = await prisma.product.findUnique({
       where: { id: productId },
-      include: {
-        categories: {
-          select: {
-            category: true,
-          },
-        },
-      },
     });
 
     if (!product || product.ownerId !== userId) {
       return res.status(404).json({ error: "Product not found" });
     }
 
-    // Delete product
-    await prisma.product.delete({ where: { id: Number(productId) } });
+    // Find and delete dependent records in CategoryToProduct table
+    await prisma.categoryToProduct.deleteMany({
+      where: { productId },
+    });
+
+    // Delete the product
+    await prisma.product.delete({
+      where: { id: productId },
+    });
 
     res.json({ message: "Product deleted successfully" });
   } catch (error) {
-    console.log(error);
+    console.error("Error deleting product:", error);
     res.status(500).json({ error: "Error deleting product" });
   }
 };
+
 
 const editProduct = async (req, res) => {
   const userId = parseInt(req.params.userId, 10); // convert string to integer

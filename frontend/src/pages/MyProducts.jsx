@@ -79,9 +79,11 @@ const MyProducts = () => {
   };
 
   const handleDelete = async (productId) => {
+    
     try {
       const apiRes = await fetch(
-        `http://localhost:3001/api/v1/${userId}/${productId}`,
+        `http://localhost:3001/api/v1/${userId}/${productId}/2`,
+
         {
           method: "DELETE",
           headers: {
@@ -91,6 +93,7 @@ const MyProducts = () => {
       );
 
       if (!apiRes.ok) {
+        console.log('${userId}')
         console.error("Error deleting product");
         return;
       }
