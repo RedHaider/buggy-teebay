@@ -9,8 +9,12 @@ export const validateLastName = (value) =>
 export const validateAddress = (value) =>
   value.trim().length < 5 ? "Address must have at least 5 letters" : null;
 
-export const validateEmail = (value) =>
-  /^\S+@\S+$/.test(value) ? null : "Invalid email";
+//validation of gmail done
+  export const validateEmail = (value) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail|yahoo)\.com$/;
+    return emailRegex.test(value) ? null : "Invalid email. Only Gmail and Yahoo emails are allowed.";
+  };
+  
 
 export const validatePassword = (value) => {
   const minLength = 8;

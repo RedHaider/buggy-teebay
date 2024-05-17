@@ -16,6 +16,7 @@ const MyProducts = () => {
   const [isAddProductClicked, setIsAddProductClicked] = useState(false);
   const [openEditProduct, setOpenEditProduct] = useState(false);
   const [productToEdit, setProductToEdit] = useState({});
+  const [deleteProductId, setDeleteProductId] = useState(null);
   const [opened, { open, close }] = useDisclosure(false);
 
   const [user, setUser] = useState(
@@ -77,6 +78,35 @@ const MyProducts = () => {
     productsQueryResults.refetch();
   };
 
+  const handleDelete = async (productId) => {
+    try {
+      const apiRes = await fetch(
+        `http://localhost:3001/api/v1/${userId}/${productId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type":"application/json"
+          }
+        }
+      );
+
+      if (!apiRes.ok) {
+        console.error("Error deleting product");
+        return;
+      }
+      close();
+      // refetch products
+      productsQueryResults.refetch();
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
+  const confirmDelete = (productId) => {
+    setDeleteProductId(productId);
+    open();
+  };
+
   if (isAddProductClicked) {
     return (
       <AddProduct
@@ -96,27 +126,6 @@ const MyProducts = () => {
       />
     );
   }
-
-  const handleDelete = async (productId) => {
-    try {
-      const apiRes = await fetch(
-        `http://localhost:3001/api/v1/${userId}/${productId}/2`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      if (!apiRes.ok) {
-        console.error("Error deleting product");
-        return;
-      }
-      close();
-      // refetch products
-      productsQueryResults.refetch();
-    } catch (error) {
-      console.error("Error deleting product:", error);
-    }
-  };
 
   return (
     <Container my="xl" py={"lg"}>
@@ -141,27 +150,10 @@ const MyProducts = () => {
                   <ProductCard
                     product={product}
                     deleteIcon={
-                      <ProductDelete onDelete={() => open()} id={product.id} />
+                      <ProductDelete onDelete={() => confirmDelete(product.id)} />
                     }
                   />
                 </Container>
-                <Modal opened={opened} onClose={close} centered padding={"xl"}>
-                  <Title order={2} fw={300}>
-                    Are you sure you want to delete this Product?
-                  </Title>
-                  <Group position="right" spacing={"lg"} mt={"5rem"}>
-                    <Button uppercase onClick={close} color="red">
-                      No
-                    </Button>
-                    <Button
-                      uppercase
-                      color="violet"
-                      onClick={() => handleDelete(product.id)}
-                    >
-                      Yes
-                    </Button>
-                  </Group>
-                </Modal>
               </Grid.Col>
             );
           })
@@ -177,6 +169,23 @@ const MyProducts = () => {
           Add Product
         </Button>
       </Group>
+      <Modal opened={opened} onClose={close} centered padding={"xl"}>
+        <Title order={2} fw={300}>
+          Are you sure you want to delete this Product?
+        </Title>
+        <Group position="right" spacing={"lg"} mt={"5rem"}>
+          <Button uppercase onClick={close} color="red">
+            No
+          </Button>
+          <Button
+            uppercase
+            color="violet"
+            onClick={() => handleDelete(deleteProductId)}
+          >
+            Yes
+          </Button>
+        </Group>
+      </Modal>
     </Container>
   );
 };
