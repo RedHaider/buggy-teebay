@@ -156,7 +156,7 @@ const deleteProduct = async (req, res) => {
       return res.status(404).json({ error: "Product not found" });
     }
 
-    // Find and delete dependent records in CategoryToProduct table
+    // Find and delete dependent records in CategoryToProduct table bug 6
     await prisma.categoryToProduct.deleteMany({
       where: { productId },
     });
