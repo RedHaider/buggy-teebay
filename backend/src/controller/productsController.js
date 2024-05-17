@@ -55,16 +55,39 @@ const getAllProducts = async (req, res) => {
 const deleteAllUserProducts = async (req, res) => {
   const userId = parseInt(req.params.userId);
   try {
-    await prisma.product.deleteMany({
-      where: {
-        ownerId: userId,
-      },
+    const productsToDelete = await prisma.product.findMany({
+      where: { ownerId: userId },
+      include: { transactions: true }, // Include associated transactions
     });
+
+    if (productsToDelete.length === 0) {
+      return res.status(200).json({ message: "No products found for user." });
+    }
+
+    // Loop through each product to delete associated transactions first
+    for (const product of productsToDelete) {
+      const transactionIds = product.transactions.map(transaction => transaction.id);
+      await prisma.transactions.deleteMany({
+        where: { id: { in: transactionIds } },
+      });
+    }
+
+    // Now delete the products themselves
+    await prisma.product.deleteMany({
+      where: { ownerId: userId },
+    });
+
     res.status(200).json({ message: "All products deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Error deleting product" });
+    console.error(error); // Log the actual error for debugging
+    res.status(500).json({ error: "Error deleting products" });
   }
 };
+
+
+
+
+
 
 
 const getMyProducts = async (req, res) => {
