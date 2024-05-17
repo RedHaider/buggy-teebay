@@ -1,13 +1,13 @@
 export const validateFirstName = (value) =>
-  value.length === 0 || value.length < 2
+  value.trim().length === 0 || value.trim().length < 2
     ? "Name must have at least 2 letters"
     : null;
 
 export const validateLastName = (value) =>
-  value.length < 2 ? "Name must have at least 2 letters" : null;
+  value.trim().length < 2 ? "Name must have at least 2 letters" : null;
 
 export const validateAddress = (value) =>
-  value.length < 5 ? "Address must have at least 5 letters" : null;
+  value.trim().length < 5 ? "Address must have at least 5 letters" : null;
 
 export const validateEmail = (value) =>
   /^\S+@\S+$/.test(value) ? null : "Invalid email";
