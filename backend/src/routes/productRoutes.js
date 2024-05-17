@@ -2,6 +2,7 @@ import Router from "express";
 import {
   addProduct,
   deleteProduct,
+  deleteAllUserProducts,
   editProduct,
   getAllProducts,
   getMyProducts,
@@ -38,6 +39,8 @@ router.post("/:userId/product", addProduct);
 
 // Delete Product
 router.delete("/:userId/:productId/2", deleteProduct);
+
+router.delete("/:userId/products", deleteAllUserProducts);
 
 // Edit Product
 router.patch("/:userId/:productId/1", editProduct);

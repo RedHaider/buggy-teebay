@@ -11,6 +11,7 @@ import ProductCard from "../components/ProductCard";
 import { useDisclosure } from "@mantine/hooks";
 import fetchMyProducts from "../data/fetchMyProducts";
 import fetchCategories from "../data/fetchCategories";
+import deleteAllUserProducts from "../data/DeleteAllProducts"
 
 const MyProducts = () => {
   const [isAddProductClicked, setIsAddProductClicked] = useState(false);
@@ -18,6 +19,7 @@ const MyProducts = () => {
   const [productToEdit, setProductToEdit] = useState({});
   const [deleteProductId, setDeleteProductId] = useState(null);
   const [opened, { open, close }] = useDisclosure(false);
+  const [deleteAllModalOpen, setDeleteAllModalOpen] = useState(false)
 
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("currentUser"))
@@ -110,6 +112,20 @@ const MyProducts = () => {
     open();
   };
 
+  const handleDeleteAllProducts = async () => {
+    try {
+      await deleteAllUserProducts(userId);
+      productsQueryResults.refetch();
+      setDeleteAllModalOpen(false);
+    } catch (error) {
+      console.error("Error deleting all products: ", error);
+    }
+  };
+
+  const confirmDeleteAllProducts = () => {
+    setDeleteAllModalOpen(true);
+  };
+
   if (isAddProductClicked) {
     return (
       <AddProduct
@@ -171,6 +187,16 @@ const MyProducts = () => {
         >
           Add Product
         </Button>
+        {products && products.length > 0 && (
+          <Button
+            color="red"
+            onClick={confirmDeleteAllProducts}
+            mx={2}
+            size="md"
+          >
+            Delete All
+          </Button>
+        )}
       </Group>
       <Modal opened={opened} onClose={close} centered padding={"xl"}>
         <Title order={2} fw={300}>
@@ -184,6 +210,32 @@ const MyProducts = () => {
             uppercase
             color="violet"
             onClick={() => handleDelete(deleteProductId)}
+          >
+            Yes
+          </Button>
+        </Group>
+      </Modal>
+      <Modal
+        opened={deleteAllModalOpen}
+        onClose={() => setDeleteAllModalOpen(false)}
+        centered
+        padding={"xl"}
+      >
+        <Title order={2} fw={300}>
+          Are you sure you want to delete all products?
+        </Title>
+        <Group position="right" spacing={"lg"} mt={"5rem"}>
+          <Button
+            uppercase
+            onClick={() => setDeleteAllModalOpen(false)}
+            color="red"
+          >
+            No
+          </Button>
+          <Button
+            uppercase
+            color="violet"
+            onClick={handleDeleteAllProducts}
           >
             Yes
           </Button>

@@ -16,6 +16,7 @@ app.use(
   })
 );
 
+
 app.use("/api/v1", productRoutes);
 app.use("/api/v1", categoryRoutes);
 app.use("/api/v1", userRoutes);
@@ -30,3 +31,4 @@ const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+

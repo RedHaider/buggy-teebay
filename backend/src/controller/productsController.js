@@ -52,6 +52,21 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+const deleteAllUserProducts = async (req, res) => {
+  const userId = parseInt(req.params.userId);
+  try {
+    await prisma.product.deleteMany({
+      where: {
+        ownerId: userId,
+      },
+    });
+    res.status(200).json({ message: "All products deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Error deleting product" });
+  }
+};
+
+
 const getMyProducts = async (req, res) => {
   const userId = parseInt(req.params.userId, 10); // convert string to integer
 
@@ -584,7 +599,9 @@ export {
   getLentProducts,
   addProduct,
   deleteProduct,
+  deleteAllUserProducts,
   editProduct,
   buyProduct,
   rentProduct,
+
 };
