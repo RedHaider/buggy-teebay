@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
-import { Card, Flex, Text, Title } from "@mantine/core";
+import { Card, Flex, Text, Title, Badge } from "@mantine/core";
 
-const ProductCard = ({ product, deleteIcon, rentalPeriod }) => {
+const ProductCard = ({ product, deleteIcon, rentalPeriod, isOwner }) => {
   const formattedTitle =
     product.title.toLowerCase().charAt(0).toUpperCase() +
     product.title.slice(1);
@@ -21,13 +21,15 @@ const ProductCard = ({ product, deleteIcon, rentalPeriod }) => {
       >
         <Flex justify={"space-between"} my={"20px"}>
           <Title fw={500}>{formattedTitle}</Title>
-          {deleteIcon && deleteIcon}
+          <Flex>
+            {isOwner && <Badge color="green">OWNER</Badge>}
+            {deleteIcon && deleteIcon}
+          </Flex>
         </Flex>
         <Text my={5} c={"dimmed"}>
           Categories:{" "}
           {product.categories
             .map(({ category }) => {
-              console.log(category);
               const categoryName = category.name.toLowerCase();
               return (
                 categoryName.charAt(0).toUpperCase() + categoryName.slice(1)

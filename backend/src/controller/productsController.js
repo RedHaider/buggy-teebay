@@ -27,7 +27,13 @@ const getAllProducts = async (req, res) => {
         rent_price: true,
         rent_duration: true,
         ownerId: true,
-        owner: true,
+        owner: {
+          select:{
+            id: true,
+            first_name:true,
+            last_name:true
+          }
+        },
         categories: {
           select: {
             category: true,

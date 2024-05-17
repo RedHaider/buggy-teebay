@@ -1,5 +1,5 @@
 import { Container, Grid, Title } from "@mantine/core";
-import { useQuery, useQueryClient } from "@tanstack/react-query"; // Imported useQueryClient
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import BuyOrRent from "../components/productActions/BuyOrRent";
 import NoProductsToDisplay from "../components/NoProductsToDisplay";
@@ -10,15 +10,13 @@ import fetchAllProducts from "../data/fetchAllProducts";
 const AllProducts = () => {
   const [isProductClicked, setIsProductClicked] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(false);
-
   const [user, setUser] = useState();
 
   useEffect(() => {
     setUser(JSON.parse(localStorage.getItem("currentUser")));
   }, []);
 
-  const queryClient = useQueryClient(); 
-
+  const queryClient = useQueryClient();
   let userId = user?.id;
 
   const queryResults = useQuery(
@@ -34,7 +32,7 @@ const AllProducts = () => {
   const handleCloseBuyRent = async () => {
     setIsProductClicked(false);
     setCurrentProduct({});
-    await queryClient.invalidateQueries(`allProducts${userId}`); 
+    await queryClient.invalidateQueries(`allProducts${userId}`);
   };
 
   if (queryResults.isLoading) {
@@ -70,13 +68,14 @@ const AllProducts = () => {
           </Grid.Col>
         ) : (
           products.map((product) => {
+            const isOwner = product.ownerId === userId;
             return (
               <Grid.Col key={product.id}>
                 <Container
                   size={"xl"}
                   onClick={() => handleProductCardClick(product)}
                 >
-                  <ProductCard product={product} />
+                  <ProductCard product={product} isOwner={isOwner} />
                 </Container>
               </Grid.Col>
             );
