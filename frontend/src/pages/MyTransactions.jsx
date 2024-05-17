@@ -17,7 +17,7 @@ const MyTransactions = () => {
     setUser(JSON.parse(localStorage.getItem("currentUser")));
   }, []);
 
-  const queryClient = useQueryClient(); // Added useQueryClient to get the query client
+  const queryClient = useQueryClient(); // for real time 
 
   let userId = user?.id;
 
@@ -25,7 +25,7 @@ const MyTransactions = () => {
     return <NotLoggedIn />;
   }
 
-  // Function to handle new transactions and invalidate queries
+  // used the UQC for real time
   const handleNewTransaction = async () => {
     await queryClient.invalidateQueries(`boughtProducts${userId}`);
     await queryClient.invalidateQueries(`soldProducts${userId}`);
