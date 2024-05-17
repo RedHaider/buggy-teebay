@@ -1,5 +1,5 @@
 import { Container, Grid, Title } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query"; // Imported useQueryClient
 import { useEffect, useState } from "react";
 import BuyOrRent from "../components/productActions/BuyOrRent";
 import NoProductsToDisplay from "../components/NoProductsToDisplay";
@@ -17,6 +17,8 @@ const AllProducts = () => {
     setUser(JSON.parse(localStorage.getItem("currentUser")));
   }, []);
 
+  const queryClient = useQueryClient(); 
+
   let userId = user?.id;
 
   const queryResults = useQuery(
@@ -29,6 +31,12 @@ const AllProducts = () => {
 
   const products = queryResults.data || [];
 
+  const handleCloseBuyRent = async () => {
+    setIsProductClicked(false);
+    setCurrentProduct({});
+    await queryClient.invalidateQueries(`allProducts${userId}`); 
+  };
+
   if (queryResults.isLoading) {
     return <Loading />;
   }
@@ -36,12 +44,6 @@ const AllProducts = () => {
   const handleProductCardClick = (product) => {
     setIsProductClicked(true);
     setCurrentProduct(product);
-  };
-
-  const handleCloseBuyRent = () => {
-    setIsProductClicked(false);
-    setCurrentProduct({});
-    queryResults.refetch();
   };
 
   if (isProductClicked) {
@@ -53,8 +55,6 @@ const AllProducts = () => {
       />
     );
   }
-
-  console.log(products);
 
   return (
     <Container my="xl" py={"lg"}>

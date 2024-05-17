@@ -6,6 +6,7 @@ import LentProducts from "../components/transactionRecords/LentProducts";
 import { Link } from "react-router-dom";
 import NotLoggedIn from "../components/NotLoggedIn";
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query"; // Imported useQueryClient
 
 const MyTransactions = () => {
   const [user, setUser] = useState(
@@ -16,11 +17,21 @@ const MyTransactions = () => {
     setUser(JSON.parse(localStorage.getItem("currentUser")));
   }, []);
 
+  const queryClient = useQueryClient(); // Added useQueryClient to get the query client
+
   let userId = user?.id;
 
   if (!userId) {
     return <NotLoggedIn />;
   }
+
+  // Function to handle new transactions and invalidate queries
+  const handleNewTransaction = async () => {
+    await queryClient.invalidateQueries(`boughtProducts${userId}`);
+    await queryClient.invalidateQueries(`soldProducts${userId}`);
+    await queryClient.invalidateQueries(`borrowedProducts${userId}`);
+    await queryClient.invalidateQueries(`lentProducts${userId}`);
+  };
 
   return (
     <div>
@@ -37,19 +48,19 @@ const MyTransactions = () => {
         </Tabs.List>
 
         <Tabs.Panel value="bought" pt="xs">
-          <BoughtProducts userId={userId} />
+          <BoughtProducts userId={userId} onNewTransaction={handleNewTransaction} />
         </Tabs.Panel>
 
         <Tabs.Panel value="sold" pt="xs">
-          <SoldProducts userId={userId} />
+          <SoldProducts userId={userId} onNewTransaction={handleNewTransaction} />
         </Tabs.Panel>
 
         <Tabs.Panel value="borrowed" pt="xs">
-          <BorrowedProducts userId={userId} />
+          <BorrowedProducts userId={userId} onNewTransaction={handleNewTransaction} />
         </Tabs.Panel>
 
         <Tabs.Panel value="lent" pt="xs">
-          <LentProducts userId={userId} />
+          <LentProducts userId={userId} onNewTransaction={handleNewTransaction} />
         </Tabs.Panel>
       </Tabs>
       <Group position="center" spacing={"xl"} mb={100}>
